@@ -37571,14 +37571,20 @@ var Publisher = function(options) {
           return;
         }
 
-        Publisher.getUserMedia(
-          constraints,
-          onStreamAvailable,
-          onStreamAvailableError,
-          onAccessDialogOpened,
-          onAccessDialogClosed,
-          onAccessDenied
-        );
+        if (properties._stream) {
+          setTimeout(function() {
+            onStreamAvailable(properties._stream);
+          }, 0);
+        } else {
+          Publisher.getUserMedia(
+            constraints,
+            onStreamAvailable,
+            onStreamAvailableError,
+            onAccessDialogOpened,
+            onAccessDialogClosed,
+            onAccessDenied
+          );
+        }
       }
 
       if (isScreenSharing) {
@@ -47036,6 +47042,10 @@ if (!OTPlugin.isSupported()) {
   // Except that the constraints won't be identical
   OTPlugin.getUserMedia = function getUserMedia(userConstraints, success, error) {
     var constraints = new MediaConstraints(userConstraints);
+
+    setTimeout(function() {
+      success(constraints.screenSharingStream);
+    }, 0);
 
     if (constraints.screenSharing) {
       _getUserMedia(constraints, success, error);
